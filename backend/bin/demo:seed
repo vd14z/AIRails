@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Script to seed demo data
+# Usage: bin/demo:seed
+
+require_relative "../config/environment"
+
+puts "🌱 Seeding demo data..."
+Rails.application.load_seed
+puts "✅ Demo data seeded successfully!"
+

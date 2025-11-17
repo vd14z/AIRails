@@ -1,0 +1,640 @@
+---
+description: Frontend development standards, best practices, and conventions for the LTI React application including component patterns, state management, UI/UX guidelines, and testing practices
+globs: ["frontend/src/**/*.{js,jsx,ts,tsx}", "frontend/tsconfig*.json", "frontend/vite.config.ts", "frontend/package.json"]
+alwaysApply: true
+---
+
+# Frontend Project Configuration and Best Practices
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Technology Stack](#technology-stack)
+  - [Core Technologies](#core-technologies)
+  - [UI Framework](#ui-framework)
+  - [State Management & Data Flow](#state-management--data-flow)
+  - [Testing Framework](#testing-framework)
+  - [Development Tools](#development-tools)
+- [Project Structure](#project-structure)
+- [Coding Standards](#coding-standards)
+  - [Language and Naming Conventions](#language-and-naming-conventions)
+  - [Component Conventions](#component-conventions)
+  - [State Management](#state-management)
+  - [Service Layer Architecture](#service-layer-architecture)
+- [UI/UX Standards](#uiux-standards)
+  - [Chakra UI Integration](#chakra-ui-integration)
+  - [Form Handling with React Hook Form + Zod](#form-handling-with-react-hook-form--zod)
+  - [Navigation Patterns](#navigation-patterns)
+  - [Accessibility](#accessibility)
+- [Testing Standards](#testing-standards)
+  - [Unit and Integration Testing with Vitest](#unit-and-integration-testing-with-vitest)
+  - [Component Testing with Storybook](#component-testing-with-storybook)
+  - [Test Organization](#test-organization)
+- [Configuration Standards](#configuration-standards)
+  - [TypeScript Configuration](#typescript-configuration)
+  - [ESLint Configuration](#eslint-configuration)
+  - [Environment Configuration](#environment-configuration)
+- [Performance Best Practices](#performance-best-practices)
+  - [Component Optimization](#component-optimization)
+  - [Bundle Optimization](#bundle-optimization)
+  - [API Efficiency](#api-efficiency)
+- [Development Workflow](#development-workflow)
+  - [Git Workflow](#git-workflow)
+  - [Development Scripts](#development-scripts)
+  - [Code Quality](#code-quality)
+- [Migration Strategy](#migration-strategy)
+  - [TypeScript Migration](#typescript-migration)
+  - [Component Modernization](#component-modernization)
+
+---
+
+## Overview
+
+This document outlines the best practices, conventions, and standards used in the LTI frontend application. These practices ensure code consistency, maintainability, and optimal development experience.
+
+## Technology Stack
+
+### Core Technologies
+- **React 18.3.1**: Modern React with functional components and hooks
+- **TypeScript 5.9.3**: For type safety and better development experience
+- **Vite 5.2.0**: Build tooling and development server (replaces Create React App)
+- **React Router DOM 6.28.2**: Client-side routing and navigation
+
+### UI Framework
+- **Chakra UI 3.29.0**: Component library for React (v3 API)
+- **@chakra-ui/color-mode 2.2.0**: Color mode management for Chakra UI
+- **@emotion/react 11.14.0**: CSS-in-JS library (required by Chakra UI)
+- **@emotion/styled 11.14.1**: Styled components for Emotion
+- **framer-motion 12.23.24**: Animation library (used by Chakra UI)
+- **react-icons 5.5.0**: Icon library (replaces React Bootstrap Icons)
+
+### State Management & Data Flow
+- **React Hooks**: useState, useEffect for local component state
+- **TanStack Query 5.90.9**: Server state management and data fetching
+- **Zustand 5.0.8**: Lightweight client state management
+- **Axios 1.13.2**: HTTP client for API communication
+
+### Form Handling & Validation
+- **React Hook Form 7.66.0**: Form state management
+- **Zod 4.1.12**: Schema validation library
+- **@hookform/resolvers 5.2.2**: Zod resolver for React Hook Form
+
+### Testing Framework
+- **Vitest 4.0.9**: Unit and integration testing (replaces Jest)
+- **React Testing Library 16.3.0**: Component testing utilities
+- **@testing-library/jest-dom 6.9.1**: Custom Jest matchers for DOM
+- **@testing-library/user-event 14.6.1**: User interaction simulation
+- **Storybook 10.0.7**: Component development and documentation
+
+### Development Tools
+- **ESLint 9.39.1**: Code linting with React-specific rules
+- **TypeScript**: Static type checking with strict mode
+- **Vite**: Fast build tool with HMR (Hot Module Replacement)
+
+## Project Structure
+
+```
+frontend/
+├── public/                 # Static assets
+├── src/
+│   ├── components/        # Reusable UI components
+│   │   ├── ui/           # Base UI components (StatCard, ScoreBadge, etc.)
+│   │   ├── feedback/     # Feedback components
+│   │   └── navigation/   # Navigation components
+│   ├── features/         # Feature-based organization
+│   │   ├── pipeline/     # Pipeline feature
+│   │   ├── job-generator/# Job generator feature
+│   │   ├── insights/    # Insights feature
+│   │   └── executive-summary/ # Executive summary feature
+│   ├── services/         # API service layer
+│   │   └── api/         # API client, hooks, types
+│   ├── stores/          # Zustand stores
+│   ├── hooks/           # Custom React hooks
+│   ├── layouts/         # Layout components
+│   ├── providers/       # Context providers (QueryProvider, etc.)
+│   ├── theme/           # Chakra UI theme configuration
+│   ├── utils/           # Utility functions
+│   ├── assets/          # Images, fonts, static resources
+│   ├── stories/         # Storybook stories
+│   ├── tests/           # Test utilities and setup
+│   ├── App.tsx          # Main application component
+│   ├── main.tsx         # Application entry point
+│   ├── router.tsx       # React Router configuration
+│   └── index.css        # Global styles
+├── package.json         # Dependencies and scripts
+├── tsconfig.json       # TypeScript configuration (project references)
+├── tsconfig.app.json   # TypeScript config for app
+├── tsconfig.node.json   # TypeScript config for Node scripts
+├── vite.config.ts      # Vite configuration
+└── .storybook/         # Storybook configuration (if exists)
+```
+
+## Coding Standards
+
+### Naming Conventions
+
+- **Component Naming**: Use PascalCase for React components (e.g., `CandidateCard`, `PositionDetails`, `RecruiterDashboard`)
+- **Variable Naming**: Use camelCase for variables and functions (e.g., `candidateId`, `handleSubmit`, `fetchPositions`)
+- **Constants Naming**: Use UPPER_SNAKE_CASE for constants (e.g., `MAX_CANDIDATES_PER_PAGE`, `API_BASE_URL`)
+- **Type/Interface Naming**: Use PascalCase for types and interfaces (e.g., `CandidateData`, `PositionProps`, `ICandidateService`)
+- **File Naming**: Use PascalCase for component files (e.g., `CandidateCard.tsx`, `PositionDetails.tsx`) and camelCase for utility files (e.g., `candidateService.js`, `apiUtils.ts`)
+- **CSS Class Naming**: Use kebab-case for CSS classes (e.g., `candidate-card`, `position-details`)
+- **Hook Naming**: Use camelCase starting with "use" prefix (e.g., `useCandidate`, `usePositionData`, `useFormValidation`)
+
+**Examples:**
+
+```typescript
+// Good: All in English
+import React, { useState, useEffect } from 'react';
+
+type CandidateCardProps = {
+    candidate: Candidate;
+    index: number;
+    onClick: (candidate: Candidate) => void;
+};
+
+const CandidateCard: React.FC<CandidateCardProps> = ({ candidate, index, onClick }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    
+    // Handle candidate card click event
+    const handleCardClick = () => {
+        onClick(candidate);
+    };
+    
+    return (
+        <div className="candidate-card" onClick={handleCardClick}>
+            {/* Component JSX */}
+        </div>
+    );
+};
+
+// Avoid: Non-English comments or names
+const TarjetaCandidato: React.FC<PropsTarjetaCandidato> = ({ candidato, indice, alHacerClic }) => {
+    const [estaCargando, setEstaCargando] = useState(false);
+    
+    // Manejar evento de clic en la tarjeta de candidato
+    const manejarClicTarjeta = () => {
+        alHacerClic(candidato);
+    };
+    
+    return (
+        <div className="tarjeta-candidato" onClick={manejarClicTarjeta}>
+            {/* JSX del componente */}
+        </div>
+    );
+};
+```
+
+**Error Messages and Console Logs:**
+
+```typescript
+// Good: English error messages
+catch (error) {
+    console.error('Failed to fetch candidates:', error);
+    setError('Unable to load candidates. Please try again later.');
+}
+
+// Avoid: Non-English messages
+catch (error) {
+    console.error('Error al obtener candidatos:', error);
+    setError('No se pudieron cargar los candidatos. Por favor, inténtelo de nuevo más tarde.');
+}
+```
+
+**Service Layer Examples:**
+
+```typescript
+// Good: English naming in services
+export const candidateService = {
+    getAllCandidates: async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/candidates`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching candidates:', error);
+            throw error;
+        }
+    }
+};
+
+// Avoid: Non-English naming
+export const servicioCandidatos = {
+    obtenerTodosLosCandidatos: async () => {
+        try {
+            const respuesta = await axios.get(`${API_BASE_URL}/candidates`);
+            return respuesta.data;
+        } catch (error) {
+            console.error('Error al obtener candidatos:', error);
+            throw error;
+        }
+    }
+};
+```
+
+### Component Conventions
+
+#### Functional Components
+- **Always use functional components** with hooks instead of class components
+- Use **TypeScript for new components** when possible
+- Keep **JavaScript for legacy components** until migration
+
+```typescript
+// Preferred - TypeScript functional component
+import React, { useState, useEffect } from 'react';
+
+type Position = {
+    id: number;
+    title: string;
+    status: 'Open' | 'Contratado' | 'Cerrado' | 'Borrador';
+};
+
+const Positions: React.FC = () => {
+    const [positions, setPositions] = useState<Position[]>([]);
+    // Component logic
+};
+```
+
+#### Component Props
+- **Define TypeScript interfaces** for component props when using TypeScript
+- Use **destructuring** for props
+- Include **default values** where appropriate
+
+```typescript
+type CandidateCardProps = {
+    candidate: Candidate;
+    index: number;
+    onClick: (candidate: Candidate) => void;
+};
+
+const CandidateCard: React.FC<CandidateCardProps> = ({ candidate, index, onClick }) => {
+    // Component implementation
+};
+```
+
+### State Management
+
+#### Local State with Hooks
+- Use **useState** for component-level state
+- Use **useEffect** for side effects and data fetching
+- **Extract custom hooks** for reusable stateful logic
+
+```javascript
+const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    status: 'Borrador'
+});
+
+const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+        ...prev,
+        [name]: value
+    }));
+};
+```
+
+#### Loading and Error States
+- **Always handle loading states** for async operations
+- **Implement error handling** with user-friendly messages
+- **Use TanStack Query** for server state management (handles loading/error automatically)
+- **Use Chakra UI Alert** components for feedback
+
+```typescript
+// Using TanStack Query (Recommended)
+import { useQuery } from '@tanstack/react-query';
+
+const { data, isLoading, error } = useQuery({
+  queryKey: ['candidates'],
+  queryFn: fetchCandidates,
+});
+
+// Manual state management (if needed)
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState<string | null>(null);
+
+try {
+    setLoading(true);
+    const data = await apiCall();
+} catch (err) {
+    setError(err instanceof Error ? err.message : 'An error occurred');
+} finally {
+    setLoading(false);
+}
+```
+
+### Service Layer Architecture
+
+#### API Services with TanStack Query
+- **Centralize API calls** in service files
+- Use **axios** for HTTP requests with configured client
+- **Use TanStack Query hooks** for data fetching and caching
+- **Handle errors at service level** when appropriate
+- **Export query hooks** instead of service objects
+
+```typescript
+// src/services/api/client.ts
+import axios from 'axios';
+
+export const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 10000,
+});
+
+// src/services/api/hooks.ts
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiClient } from './client';
+
+export const usePositionsQuery = () =>
+  useQuery({
+    queryKey: ['positions'],
+    queryFn: async () => {
+      const response = await apiClient.get('/positions');
+      return response.data;
+    },
+  });
+
+export const useUpdatePositionMutation = () =>
+  useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: PositionData }) => {
+      const response = await apiClient.put(`/positions/${id}`, data);
+      return response.data;
+    },
+  });
+```
+
+## UI/UX Standards
+
+### Chakra UI Integration
+- Use **Chakra UI v3 components** (Box, VStack, HStack, Button, etc.)
+- **Configure theme** using `createSystem` and `defaultConfig`
+- Follow **Chakra UI design tokens** for colors, spacing, and typography
+- Use **@chakra-ui/color-mode** for dark/light mode support
+
+```typescript
+import { Box, VStack, HStack, Button, Input, Text } from '@chakra-ui/react';
+import { useColorMode, useColorModeValue } from '@chakra-ui/color-mode';
+
+// Theme configuration
+import { createSystem, defaultConfig } from '@chakra-ui/react';
+
+export const system = createSystem(defaultConfig, {
+  theme: {
+    tokens: {
+      colors: {
+        brand: { /* color tokens */ }
+      }
+    }
+  }
+});
+```
+
+### Form Handling with React Hook Form + Zod
+- Use **React Hook Form** for form state management
+- Use **Zod** for schema validation
+- Use **@hookform/resolvers** to integrate Zod with React Hook Form
+- **Disable submit buttons** during form submission
+- **Clear form state** after successful submission
+
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Box, Button, Input, VStack, Text } from '@chakra-ui/react';
+
+const schema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().optional(),
+});
+
+type FormData = z.infer<typeof schema>;
+
+function MyForm() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    // Handle submission
+  };
+
+  return (
+    <Box as="form" onSubmit={handleSubmit(onSubmit)}>
+      <VStack spacing={4}>
+        <Input {...register('title')} placeholder="Title" />
+        {errors.title && <Text color="red.500">{errors.title.message}</Text>}
+        <Button type="submit" isLoading={isSubmitting}>
+          Save
+        </Button>
+      </VStack>
+    </Box>
+  );
+}
+```
+
+### Navigation Patterns
+- Use **React Router DOM 6.28.2** for all navigation
+- Use **useRoutes** hook for route configuration
+- **Implement breadcrumbs** with back navigation
+- Use **programmatic navigation** with useNavigate hook
+
+```typescript
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@chakra-ui/react';
+
+const navigate = useNavigate();
+const { id } = useParams<{ id: string }>();
+
+// Navigation examples
+<Button onClick={() => navigate('/')}>
+  ← Back to Dashboard
+</Button>
+```
+
+### Accessibility
+- Include **aria-label** attributes for interactive elements
+- Use **semantic HTML** elements
+- Ensure **keyboard navigation** support
+- Provide **alternative text** for images
+- Use **Chakra UI components** which have built-in accessibility
+
+```typescript
+import { Input, IconButton } from '@chakra-ui/react';
+import { FiSearch } from 'react-icons/fi';
+
+<Input 
+  placeholder="Search by title" 
+  aria-label="Search positions by title"
+/>
+
+<IconButton
+  aria-label="Search"
+  icon={<FiSearch />}
+/>
+```
+
+## Testing Standards
+
+### Unit and Integration Testing with Vitest
+- **Test components** using React Testing Library
+- Use **data-testid** attributes for reliable element selection
+- **Organize tests by feature** (CandidateCard.test.tsx, etc.)
+- **Mock API calls** using Vitest mocks or MSW (Mock Service Worker)
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { CandidateCard } from './CandidateCard';
+
+describe('CandidateCard', () => {
+  it('should render candidate name', () => {
+    render(<CandidateCard name="John Doe" score={85} step="Screening" />);
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+  });
+});
+```
+
+### Component Testing with Storybook
+- **Document components** using Storybook
+- **Test component variations** with stories
+- **Use Storybook addons** for accessibility testing (@storybook/addon-a11y)
+
+```typescript
+// CandidateCard.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import { CandidateCard } from './CandidateCard';
+
+const meta: Meta<typeof CandidateCard> = {
+  component: CandidateCard,
+};
+
+export default meta;
+type Story = StoryObj<typeof CandidateCard>;
+
+export const Default: Story = {
+  args: {
+    name: 'John Doe',
+    score: 85,
+    step: 'Screening',
+  },
+};
+```
+
+### Test Organization
+- **Group related tests** with describe blocks
+- **Use descriptive test names** that explain the expected behavior
+- **Test both success and error scenarios**
+- **Include edge cases** and validation testing
+- **Place test files** next to components (Component.test.tsx) or in __tests__ directories
+
+## Configuration Standards
+
+### TypeScript Configuration
+- Enable **strict mode** for type checking
+- Use **path mapping** with "@/*" for cleaner imports
+- Configure **verbatimModuleSyntax** for proper type-only imports
+- Use **project references** for better build performance
+
+```json
+{
+    "compilerOptions": {
+        "strict": true,
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["*"]
+        },
+        "verbatimModuleSyntax": true,
+        "target": "ES2022",
+        "module": "ESNext",
+        "jsx": "react-jsx"
+    }
+}
+```
+
+### ESLint Configuration
+- Use **ESLint 9.x** with flat config format
+- Include **React hooks rules** (eslint-plugin-react-hooks)
+- Include **TanStack Query rules** (@tanstack/eslint-plugin-query)
+- Include **Testing Library rules** (eslint-plugin-testing-library)
+- **Automatic code formatting** and error detection
+- **Consistent code style** across the project
+
+### Environment Configuration
+- Use **Vite environment variables** (VITE_* prefix)
+- Access via `import.meta.env.VITE_API_URL`
+- **Separate configurations** for development and production
+- Create `.env.example` file for documentation
+
+```typescript
+// vite.config.ts
+export default defineConfig({
+  // ... config
+});
+
+// Usage in code
+const apiUrl = import.meta.env.VITE_API_URL;
+```
+
+## Performance Best Practices
+
+### Component Optimization
+- **Lazy load** components when appropriate
+- **Memoize expensive calculations** with useMemo
+- **Avoid unnecessary re-renders** with useCallback
+- **Extract reusable logic** into custom hooks
+
+### Bundle Optimization
+- **Tree shaking** enabled through Vite
+- **Code splitting** at route level (React.lazy, Suspense)
+- **Optimize images** and static assets
+- **Monitor bundle size** with Vite build analyzer
+- **Vite HMR** for fast development experience
+
+### API Efficiency
+- **Implement proper error handling** for network requests
+- **Cache API responses** where appropriate
+- **Use loading states** to improve perceived performance
+- **Batch API calls** when possible
+
+## Development Workflow
+
+- **Feature Branches**: Develop features in separate branches, adding descriptive suffix "-frontend" to allow working in parallel and avoid conflicts or collisions
+- **Descriptive Commits**: Write descriptive commit messages in English
+- **Code Review**: Code review before merging
+- **Small Branches**: Keep branches small and focused
+
+### Development Scripts
+```bash
+npm run dev        # Start Vite development server
+npm run build      # Production build (TypeScript check + Vite build)
+npm run preview    # Preview production build
+npm test           # Run Vitest tests
+npm run test:ui    # Run Vitest with UI
+npm run lint       # Run ESLint
+npm run storybook  # Start Storybook dev server
+npm run storybook:build  # Build Storybook for production
+```
+
+### Code Quality
+- **ESLint validation** before commits
+- **TypeScript compilation** without errors
+- **All tests passing** before deployment
+- **Performance monitoring** with Web Vitals
+
+## Migration Strategy
+
+### TypeScript Migration
+- **Gradual migration** from JavaScript to TypeScript
+- **New components in TypeScript** by default
+- **Maintain existing JavaScript** components until planned refactor
+- **Add types incrementally** to existing code
+
+### Component Modernization
+- **Functional components** over class components
+- **Hooks** instead of lifecycle methods
+- **Chakra UI v3** components for consistency
+- **TypeScript** for all new components
+- **Responsive design** principles throughout
+- **Feature-based organization** (features/ directory)
+
+This document serves as the foundation for maintaining code quality and consistency across the LTI frontend application. All team members should follow these practices to ensure a maintainable and scalable codebase.

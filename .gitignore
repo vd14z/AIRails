@@ -1,0 +1,55 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# Rails
+backend/log/*
+backend/tmp/*
+backend/.byebug_history
+backend/config/master.key
+backend/config/credentials/*.key
+backend/vendor/bundle
+backend/.bundle
+backend/.sass-cache
+backend/coverage
+backend/.rspec_status
+
+# Node
+frontend/node_modules/
+frontend/.npm
+frontend/.cache
+frontend/dist
+frontend/build
+frontend/.vite
+frontend/coverage
+
+#AI
+ai-specs/.agents/*
+.cursor/*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+backend/spec/examples.txt
+frontend/.vitest
+
+# Misc
+*.pem
+*.key
+*.cert
+

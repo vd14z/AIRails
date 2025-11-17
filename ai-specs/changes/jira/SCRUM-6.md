@@ -1,0 +1,1 @@
+Generar frontend para reporte de candidato
